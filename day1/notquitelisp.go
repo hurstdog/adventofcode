@@ -16,5 +16,5 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading file %s: %v\n", INPUT, err)
 	}
-	fmt.Println(parens.Count(data))
+	fmt.Println(parens.Position(data))
 }

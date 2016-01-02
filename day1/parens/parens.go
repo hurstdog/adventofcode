@@ -15,3 +15,22 @@ func Count(s []byte) int {
 	}
 	return c
 }
+
+// Like Count(), but instead of returning the floor Santa ends up on this
+// returns the first floor where we go negative.
+func Position(s []byte) int {
+	var c int
+	for i, paren := range s {
+		switch paren {
+		case ')':
+			c--
+			if c < 0 {
+				return i + 1
+			}
+		case '(':
+			c++
+		}
+	}
+	// Doesn't mean anything to get here.
+	return -1
+}
