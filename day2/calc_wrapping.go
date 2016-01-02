@@ -19,14 +19,21 @@ func main() {
 		os.Exit(1)
 	}
 	var total int
+	var ribbon int
 	for _, line := range strings.Split(string(data), "\n") {
 		cur, err := wrapping.PaperNeeded(line)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error reading line %s: %v\n", line, err)
 			continue
 		}
-		fmt.Printf("%s -> %d. cur == %d\n", line, cur, total)
 		total += cur
+		rib, err := wrapping.RibbonNeeded(line)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading line %s: %v\n", line, err)
+			continue
+		}
+		ribbon += rib
 	}
 	fmt.Printf("Total wrapping paper needed: %d sq ft\n", total)
+	fmt.Printf("Total ribbon needed: %d ft\n", ribbon)
 }

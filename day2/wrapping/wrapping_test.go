@@ -5,6 +5,7 @@ import "testing"
 
 var lwhTable map[string][]int = make(map[string][]int)
 var areaTable map[string]int = make(map[string]int)
+var ribbonTable map[string]int = make(map[string]int)
 
 func init() {
 	lwhTable["1x1x1"] = []int{1, 1, 1}
@@ -12,6 +13,20 @@ func init() {
 	areaTable["1x1x1"] = 7
 	areaTable["2x3x4"] = 58
 	areaTable["1x1x10"] = 43
+	ribbonTable["2x3x4"] = 34
+	ribbonTable["1x1x10"] = 14
+}
+
+func TestRibbonNeeded(t *testing.T) {
+	for s, c := range ribbonTable {
+		area, err := RibbonNeeded(s)
+		if err != nil {
+			t.Errorf("RibbonNeeded %s: Got error %v", s, err)
+		}
+		if area != c {
+			t.Errorf("RibbonNeeded %s: Got %v, expected %v\n", s, area, c)
+		}
+	}
 }
 
 func TestPaperNeeded(t *testing.T) {

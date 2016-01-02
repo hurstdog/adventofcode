@@ -7,6 +7,38 @@ import (
 	"strings"
 )
 
+// RibbonNeeded calculates the ribbon needed to wrap a box of size LxWxH.
+// Len ribbon is the perimeter of the smallest face plus the volume of the box.
+// So if LxW is the smallest face, we need 2*(L+W) + L*W*H
+func RibbonNeeded(s string) (int, error) {
+	lwh, err := toLWH(s)
+	if err != nil {
+		return -1, err
+	}
+
+	// Handy shorthand
+	l := lwh[0]
+	w := lwh[1]
+	h := lwh[2]
+
+	// Perimeters
+	lw := 2 * (l + w)
+	lh := 2 * (l + h)
+	wh := 2 * (w + h)
+
+	// Find the smallest perimeter
+	least := lw
+	if lh < least {
+		least = lh
+	}
+	if wh < least {
+		least = wh
+	}
+
+	vol := l * w * h
+	return least + vol, nil
+}
+
 // PaperNeeded calculates the amount of wrapping paper needed given length,
 // width, height of a box. LWH needs to be given in a string like "LxWxH".
 // Amount needed is 2lw + 2lh + 2hw + the area of the smallest side.
