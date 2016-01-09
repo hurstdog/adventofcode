@@ -1,13 +1,12 @@
-// calc_wrapping
-// http://adventofcode.com/day/2
+// navigate
+// http://adventofcode.com/day/3
 package main
 
 import (
 	"fmt"
-	"github.com/hurstdog/adventofcode/day2/wrapping"
+	"github.com/hurstdog/adventofcode/day3/nav"
 	"io/ioutil"
 	"os"
-	"strings"
 )
 
 const INPUT = "input.txt"
@@ -18,22 +17,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error reading file %s: %v\n", INPUT, err)
 		os.Exit(1)
 	}
-	var total int
-	var ribbon int
-	for _, line := range strings.Split(string(data), "\n") {
-		cur, err := wrapping.PaperNeeded(line)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error reading line %s: %v\n", line, err)
-			continue
-		}
-		total += cur
-		rib, err := wrapping.RibbonNeeded(line)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error reading line %s: %v\n", line, err)
-			continue
-		}
-		ribbon += rib
+	dirs := string(data)
+	c, err := nav.AtLeastOne(dirs)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error processing directions: %v", err)
 	}
-	fmt.Printf("Total wrapping paper needed: %d sq ft\n", total)
-	fmt.Printf("Total ribbon needed: %d ft\n", ribbon)
+	fmt.Printf("Total points visited: %d\n", c)
 }
