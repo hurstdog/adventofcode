@@ -27,3 +27,22 @@ func testUpdate(p Point, d string, e Point, t *testing.T) Point {
 	}
 	return res
 }
+
+func TestHandleDirections(t *testing.T) {
+	err := handleDirections(">>^<vv")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	checkPointVal(Point{0, 0}, 1, t)
+	checkPointVal(Point{1, 0}, 2, t)
+	checkPointVal(Point{2, 0}, 1, t)
+	checkPointVal(Point{2, 1}, 1, t)
+	checkPointVal(Point{1, 1}, 1, t)
+	checkPointVal(Point{1, -1}, 1, t)
+}
+
+func checkPointVal(p Point, v int, t *testing.T) {
+	if pointsSeen[p] != v {
+		t.Errorf("Point %v count: Expected %d, got %d\n", p, v, pointsSeen[p])
+	}
+}
