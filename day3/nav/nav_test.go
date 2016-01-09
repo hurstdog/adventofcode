@@ -29,6 +29,7 @@ func testUpdate(p Point, d string, e Point, t *testing.T) Point {
 }
 
 func TestHandleDirections(t *testing.T) {
+	ResetPoints()
 	err := handleDirections(">>^<vv")
 	if err != nil {
 		t.Errorf("%v", err)
@@ -44,5 +45,24 @@ func TestHandleDirections(t *testing.T) {
 func checkPointVal(p Point, v int, t *testing.T) {
 	if pointsSeen[p] != v {
 		t.Errorf("Point %v count: Expected %d, got %d\n", p, v, pointsSeen[p])
+	}
+}
+
+func TestAtLeastOne(t *testing.T) {
+	ResetPoints()
+	c, err := AtLeastOne("")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if c != 1 {
+		t.Errorf("Base case: expected 1, got %d", c)
+	}
+	ResetPoints()
+	c, err = AtLeastOne(">>^<vv")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if c != 6 {
+		t.Errorf("Expected count 6, got count %d", c)
 	}
 }

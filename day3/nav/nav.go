@@ -13,6 +13,23 @@ type Point struct {
 
 var pointsSeen map[Point]int = make(map[Point]int)
 
+// Given a string of directions like <>^v... this will run the directions and
+// return a count of the number of points that get visited at least once.
+func AtLeastOne(dirs string) (int, error) {
+	err := handleDirections(dirs)
+	if err != nil {
+		return -1, err
+	}
+
+	return len(pointsSeen), nil
+}
+
+func ResetPoints() {
+	for k, _ := range pointsSeen {
+		delete(pointsSeen, k)
+	}
+}
+
 func handleDirections(dirs string) error {
 	// Inialize the first point
 	p := Point{0, 0}
