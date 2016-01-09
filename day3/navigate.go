@@ -23,4 +23,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error processing directions: %v", err)
 	}
 	fmt.Printf("Total points visited: %d\n", c)
+
+	c, err = nav.AtLeastOneRobo(dirs)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error processing directions: %v", err)
+	}
+	fmt.Printf("Total robo points visited: %d\n", c)
 }

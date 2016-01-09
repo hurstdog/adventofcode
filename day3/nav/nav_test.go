@@ -49,7 +49,6 @@ func checkPointVal(p Point, v int, t *testing.T) {
 }
 
 func TestAtLeastOne(t *testing.T) {
-	ResetPoints()
 	c, err := AtLeastOne("")
 	if err != nil {
 		t.Errorf("%v", err)
@@ -57,12 +56,28 @@ func TestAtLeastOne(t *testing.T) {
 	if c != 1 {
 		t.Errorf("Base case: expected 1, got %d", c)
 	}
-	ResetPoints()
 	c, err = AtLeastOne(">>^<vv")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 	if c != 6 {
 		t.Errorf("Expected count 6, got count %d", c)
+	}
+}
+
+func TestAtLeastOneRobo(t *testing.T) {
+	testRoboCount("", 1, t)
+	testRoboCount("^v", 3, t)
+	testRoboCount("^>v<", 3, t)
+	testRoboCount("^v^v^v^v^v", 11, t)
+}
+
+func testRoboCount(dirs string, expected int, t *testing.T) {
+	c, err := AtLeastOneRobo(dirs)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if c != expected {
+		t.Errorf("Expected count %d, got count %d", expected, c)
 	}
 }
