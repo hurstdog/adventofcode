@@ -5,6 +5,21 @@ import (
 	"testing"
 )
 
+func TestNice(t *testing.T) {
+	testNice("ugknbfddgicrmopn", true, t)
+	testNice("aaa", true, t)
+	testNice("jchzalrnumimnmhp", false, t) // no double letter
+	testNice("haegwjzuvuyypxyu", false, t) // contains xy
+	testNice("dvszwmarrgswjxmb", false, t) // one vowel
+}
+
+func testNice(s string, exp bool, t *testing.T) {
+	res := Nice(s)
+	if res != exp {
+		t.Errorf("Error: Nice(%s) == %t, expected %t", s, res, exp)
+	}
+}
+
 func TestHasRepeat(t *testing.T) {
 	testRepeat("abcde", false, t)
 	testRepeat("abcdd", true, t)
@@ -26,8 +41,9 @@ func TestVowels(t *testing.T) {
 	testVowels("aei", true, t)
 	testVowels("bou", false, t)
 	testVowels("aeiou", true, t)
-	testVowels("abcdafgha", false, t)
 	testVowels("abicdafghoa", true, t)
+	testVowels("aaa", true, t)
+	testVowels("aa", false, t)
 }
 
 func testVowels(s string, exp bool, t *testing.T) {

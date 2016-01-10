@@ -6,8 +6,8 @@ import (
 )
 
 // Returns true if a string is nice, false, if it's naughty
-func nice(s string) bool {
-	return false
+func Nice(s string) bool {
+	return repeats(s) && vowels(s) && !banned(s)
 }
 
 // repeats returns true if the string has a character that repeats itself.
@@ -30,9 +30,7 @@ func repeats(s string) bool {
 func vowels(s string) bool {
 	var c int
 	for _, v := range []string{"a", "e", "i", "o", "u"} {
-		if strings.Index(s, v) >= 0 {
-			c++
-		}
+		c += strings.Count(s, v)
 	}
 
 	return c >= 3
