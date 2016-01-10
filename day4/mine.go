@@ -6,20 +6,33 @@ package main
 import (
 	"crypto/md5"
 	"fmt"
+	"strings"
 )
 
 const INPUT = "bgvyzdsv"
-const MAXNUM = 1 << 31
+const MAXNUM = 1 << 62
+const CHECK = 3
 const PREFIX = "000000"
 
 func main() {
-	for i := 0; i < MAXNUM; i++ {
-		t := fmt.Sprintf("%s%d", INPUT, i)
-		sum := md5.Sum([]byte(t))
-		p := string(sum[0:5])
-		if p == PREFIX {
-			fmt.Printf("%d: md5(%v) = %v\n", i, t, sum)
-			break
-		}
+	ch := make(chan string)
+	for i := int64(0); i < MAXNUM; i++ {
+		go testInt(i, ch)
+	}
+
+	// Print the first three results and quit
+	for i := 0; i < CHECK; i++ {
+		fmt.Println(<-ch)
+	}
+}
+
+func testInt(i int64, ch chan<- string) {
+	t := fmt.Sprintf("%s%d", INPUT, i)
+	sum := fmt.Sprintf("%032x", md5.Sum([]byte(t)))
+	if i%10000 == 0 {
+		fmt.Printf("Test: %d: md5(%v) = %v\n", i, t, sum)
+	}
+	if strings.HasPrefix(sum, PREFIX) {
+		ch <- fmt.Sprintf("%d: md5(%v) = %v\n", i, t, sum)
 	}
 }
