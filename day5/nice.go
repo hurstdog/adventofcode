@@ -17,10 +17,20 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error opening file %s: %v", INPUT, err)
 	}
 
-	var c int
+	var lines int
+	ch := make(chan bool)
 	buf := bufio.NewScanner(f)
 	for buf.Scan() {
-		if nice.Nice(buf.Text()) {
+		lines++
+		go func() {
+			ch <- nice.Nice(buf.Text())
+		}()
+	}
+
+	var c int
+	for i := 0; i < lines; i++ {
+		r := <-ch
+		if r {
 			c++
 		}
 	}
