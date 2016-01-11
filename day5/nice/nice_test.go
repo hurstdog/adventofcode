@@ -69,3 +69,47 @@ func testBanned(s string, exp bool, t *testing.T) {
 		t.Errorf("Error: banned(%s) == %v, expected %v", s, res, exp)
 	}
 }
+
+func TestDoubleDouble(t *testing.T) {
+	testDoubleDouble("xyxy", true, t)
+	testDoubleDouble("aabcdefgaa", true, t)
+	testDoubleDouble("aaa", false, t)
+}
+
+func testDoubleDouble(s string, exp bool, t *testing.T) {
+	res := doubledouble(s)
+	if res != exp {
+		t.Errorf("Error: doubledouble(%s) == %v, expected %v", s, res, exp)
+	}
+}
+
+func TestGapRepeat(t *testing.T) {
+	testGapRepeat("", false, t)
+	testGapRepeat("a", false, t)
+	testGapRepeat("aa", false, t)
+	testGapRepeat("aaa", true, t)
+	testGapRepeat("xyx", true, t)
+	testGapRepeat("aabcdefe", true, t)
+	testGapRepeat("aabcdefg", false, t)
+}
+
+func testGapRepeat(s string, exp bool, t *testing.T) {
+	res := gaprepeat(s)
+	if res != exp {
+		t.Errorf("Error: doubledouble(%s) == %v, expected %v", s, res, exp)
+	}
+}
+
+func TestNice2(t *testing.T) {
+	testNice2("qjhvhtzxzqqjkmpb", true, t)
+	testNice2("xxyxx", true, t)
+	testNice2("uurcxstgmygtbstg", false, t)
+	testNice2("ieodomkazucvgmuy", false, t)
+}
+
+func testNice2(s string, exp bool, t *testing.T) {
+	res := Nice2(s)
+	if res != exp {
+		t.Errorf("Error: Nice2(%s) == %t, expected %t", s, res, exp)
+	}
+}
