@@ -5,6 +5,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/hurstdog/adventofcode/day6/lights"
 	"os"
 )
 
@@ -22,8 +23,12 @@ func main() {
 		if !buf.Scan() {
 			break
 		}
-		t := buf.Text()
-		fmt.Printf("Read line: [%s]\n", string(t))
+		line := buf.Text()
+		cmd, err := lights.LineToCmd(line)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error processing line [%s]: %v\n", line, err)
+		}
+		fmt.Printf("%s -> %v\n", line, cmd)
 		c++
 		if c > 10 {
 			os.Exit(0)
