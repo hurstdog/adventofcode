@@ -16,10 +16,14 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error reading %s: %v\n", INPUT, err)
 		os.Exit(1)
 	}
-	buf := bufio.NewReader(f)
+	buf := bufio.NewScanner(f)
 	c := 0
-	for line := range buf.ReadLine() {
-		fmt.Printf("Read line: [%s]\n", string(line))
+	for {
+		if !buf.Scan() {
+			break
+		}
+		t := buf.Text()
+		fmt.Printf("Read line: [%s]\n", string(t))
 		c++
 		if c > 10 {
 			os.Exit(0)
