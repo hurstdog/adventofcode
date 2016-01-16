@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-var locTable map[string][]int = make(map[string][]int)
-
 func TestUpdateLoc(t *testing.T) {
 	var p Point // 0, 0
 	p = testUpdate(p, ">", Point{1, 0}, t)
