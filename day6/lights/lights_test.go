@@ -42,6 +42,47 @@ func TestSetLight(t *testing.T) {
 	expectValue(v, OFF, err, t)
 }
 
+func TestNumOn(t *testing.T) {
+	InitLights()
+	n := NumOn()
+	if n != 0 {
+		t.Errorf("Expected 0 lights on, got %d\n", n)
+	}
+	ApplyCmd(Command{ON, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	n = NumOn()
+	if n != NUM_LIGHTS {
+		t.Errorf("Expected %d lights on, got %d\n", NUM_LIGHTS, n)
+	}
+}
+
+func assertAllSet(v int, t *testing.T) {
+	for i := 0; i < EDGE; i++ {
+		for j := 0; j < EDGE; j++ {
+			if lights[i][j] != v {
+				t.Errorf("lights[%d][%d] == %d, expected %d\n", i, j, lights[i][j], v)
+			}
+		}
+	}
+}
+
+func TestApplyCmd(t *testing.T) {
+	InitLights()
+
+	assertAllSet(OFF, t)
+
+	ApplyCmd(Command{ON, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	assertAllSet(ON, t)
+
+	ApplyCmd(Command{TOGGLE, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	assertAllSet(OFF, t)
+
+	ApplyCmd(Command{TOGGLE, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	assertAllSet(ON, t)
+
+	ApplyCmd(Command{OFF, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	assertAllSet(OFF, t)
+}
+
 func expectValue(v int, exp int, err error, t *testing.T) {
 	if err != nil {
 		t.Errorf("Expecting %v value == %v, got error: %v\n", v, exp, err)

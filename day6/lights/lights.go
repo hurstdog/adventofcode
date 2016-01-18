@@ -25,11 +25,21 @@ type Command struct {
 }
 
 const EDGE = 1000
+const NUM_LIGHTS = EDGE * EDGE
 
 // Grid[x][y] == Point
 type Grid [EDGE][EDGE]int
 
+// Fun fact: initialized to all off
 var lights Grid
+
+func InitLights() {
+	for i := 0; i < EDGE; i++ {
+		for j := 0; j < EDGE; j++ {
+			setLight(Point{i, j, OFF}, OFF)
+		}
+	}
+}
 
 // Given a point, returns the value stored at that Point in the grid, or an
 // error.
@@ -62,6 +72,31 @@ func setLight(p Point, cmd int) error {
 	}
 
 	return nil
+}
+
+// Applies the given Command to the stored light grid
+func ApplyCmd(c Command) error {
+	for i := c.start.x; i <= c.end.x; i++ {
+		for j := c.start.y; j <= c.end.y; j++ {
+			err := setLight(Point{i, j, OFF}, c.cmd)
+			if err != nil {
+				return fmt.Errorf("ApplyCmd: %v\n", err)
+			}
+		}
+	}
+	return nil
+}
+
+// Returns the number of lights set to ON
+func NumOn() int {
+	var c int
+	for i := 0; i < EDGE; i++ {
+		for j := 0; j < EDGE; j++ {
+			c += lights[i][j]
+		}
+	}
+
+	return c
 }
 
 // LineToCmd takes a string from the input file and returns a command struct
