@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	ON = iota
-	OFF
+	OFF = iota
+	ON
 	TOGGLE
 )
 
@@ -22,6 +22,11 @@ type Command struct {
 	start Point
 	end   Point
 }
+
+// Grid[x][y] == [ON|OFF]
+type Grid map[int]map[int]int
+
+var lights Grid = make(Grid)
 
 // LineToCmd takes a string from the input file and returns a command struct
 // containing the instruction to execute.
