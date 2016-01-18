@@ -14,7 +14,8 @@ const (
 )
 
 type Point struct {
-	x, y int
+	x, y  int
+	value int // ON|OFF
 }
 
 type Command struct {
@@ -23,10 +24,45 @@ type Command struct {
 	end   Point
 }
 
-// Grid[x][y] == [ON|OFF]
-type Grid map[int]map[int]int
+const EDGE = 1000
 
-var lights Grid = make(Grid)
+// Grid[x][y] == Point
+type Grid [EDGE][EDGE]int
+
+var lights Grid
+
+// Given a point, returns the value stored at that Point in the grid, or an
+// error.
+func getLight(p Point) (int, error) {
+	if p.x >= EDGE || p.y >= EDGE {
+		return OFF, fmt.Errorf("Point %v out of range %d\n", p, EDGE)
+	}
+
+	return lights[p.x][p.y], nil
+}
+
+// setLight takes a command of ON|OFF|TOGGLE and a Point, and affects that
+// instruction on that point in the Grid. This DOES NOT modify the incoming
+// Point.
+func setLight(p Point, cmd int) error {
+	if p.x >= EDGE || p.y >= EDGE {
+		return fmt.Errorf("Point %v out of range %d\n", p, EDGE)
+	}
+	switch cmd {
+	case OFF:
+		lights[p.x][p.y] = OFF
+	case ON:
+		lights[p.x][p.y] = ON
+	case TOGGLE:
+		if lights[p.x][p.y] == OFF {
+			lights[p.x][p.y] = ON
+		} else {
+			lights[p.x][p.y] = OFF
+		}
+	}
+
+	return nil
+}
 
 // LineToCmd takes a string from the input file and returns a command struct
 // containing the instruction to execute.
@@ -70,5 +106,5 @@ func parsePoint(point string) (Point, error) {
 		return Point{}, err
 	}
 
-	return Point{x, y}, nil
+	return Point{x, y, OFF}, nil
 }

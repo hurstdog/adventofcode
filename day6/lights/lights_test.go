@@ -7,13 +7,48 @@ var testData map[string]Command = make(map[string]Command)
 
 func init() {
 	testData["turn on 0,0 through 999,999"] =
-		Command{ON, Point{0, 0}, Point{999, 999}}
+		Command{ON, Point{0, 0, OFF}, Point{999, 999, OFF}}
 	testData["turn off 0,0 through 999,999"] =
-		Command{OFF, Point{0, 0}, Point{999, 999}}
+		Command{OFF, Point{0, 0, OFF}, Point{999, 999, OFF}}
 	testData["toggle 0,0 through 999,999"] =
-		Command{TOGGLE, Point{0, 0}, Point{999, 999}}
+		Command{TOGGLE, Point{0, 0, OFF}, Point{999, 999, OFF}}
 	testData["toggle 888,888 through 888,888"] =
-		Command{TOGGLE, Point{888, 888}, Point{888, 888}}
+		Command{TOGGLE, Point{888, 888, OFF}, Point{888, 888, OFF}}
+}
+
+func TestSetLight(t *testing.T) {
+	p := Point{0, 0, OFF}
+	v, err := getLight(p)
+	expectValue(v, OFF, err, t)
+
+	// OFF -> ON
+	err = setLight(p, ON)
+	v, err = getLight(p)
+	expectValue(v, ON, err, t)
+
+	// ON -> OFF
+	err = setLight(p, OFF)
+	v, err = getLight(p)
+	expectValue(v, OFF, err, t)
+
+	// OFF -> ON
+	err = setLight(p, TOGGLE)
+	v, err = getLight(p)
+	expectValue(v, ON, err, t)
+
+	// ON -> OFF
+	err = setLight(p, TOGGLE)
+	v, err = getLight(p)
+	expectValue(v, OFF, err, t)
+}
+
+func expectValue(v int, exp int, err error, t *testing.T) {
+	if err != nil {
+		t.Errorf("Expecting %v value == %v, got error: %v\n", v, exp, err)
+	}
+	if v != exp {
+		t.Errorf("Point %v, expected value %v\n", v, exp)
+	}
 }
 
 func TestLineToCmd(t *testing.T) {
