@@ -1,5 +1,6 @@
 // Blink follows the instructions in a given input file to turn on and off a
 // grid of lights.
+// Day6 part 1 solution: 400410
 package main
 
 import (
@@ -18,7 +19,6 @@ func main() {
 		os.Exit(1)
 	}
 	buf := bufio.NewScanner(f)
-	c := 0
 	for {
 		if !buf.Scan() {
 			break
@@ -26,12 +26,13 @@ func main() {
 		line := buf.Text()
 		cmd, err := lights.LineToCmd(line)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error processing line [%s]: %v\n", line, err)
+			fmt.Fprintf(os.Stderr, "Error parsing line [%s]: %v\n", line, err)
 		}
-		fmt.Printf("%s -> %v\n", line, cmd)
-		c++
-		if c > 10 {
-			os.Exit(0)
+		err = lights.ApplyCmd(cmd)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error applying line [%s]: %v\n", line, err)
 		}
 	}
+	n := lights.NumOn()
+	fmt.Println("After all commands, %d are on\n", n)
 }
