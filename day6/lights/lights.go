@@ -7,11 +7,10 @@ import (
 	"strings"
 )
 
-// TODO: Switch to the trick for declaring enums.
 const (
-	ON     = 0
-	OFF    = 1
-	TOGGLE = 2
+	ON = iota
+	OFF
+	TOGGLE
 )
 
 type Point struct {
