@@ -14,8 +14,7 @@ const (
 )
 
 type Point struct {
-	x, y  int
-	value int // ON|OFF
+	x, y int
 }
 
 type Command struct {
@@ -27,7 +26,7 @@ type Command struct {
 const EDGE = 1000
 const NUM_LIGHTS = EDGE * EDGE
 
-// Grid[x][y] == Point
+// Grid[x][y] == brightness
 type Grid [EDGE][EDGE]int
 
 // Fun fact: initialized to all off
@@ -36,13 +35,13 @@ var lights Grid
 func InitLights() {
 	for i := 0; i < EDGE; i++ {
 		for j := 0; j < EDGE; j++ {
-			setLight(Point{i, j, OFF}, OFF)
+			setLight(Point{i, j}, OFF)
 		}
 	}
 }
 
-// Given a point, returns the value stored at that Point in the grid, or an
-// error.
+// Given a point, returns the brightness stored at that Point in the grid, or
+// an error.
 func getLight(p Point) (int, error) {
 	if p.x >= EDGE || p.y >= EDGE {
 		return OFF, fmt.Errorf("Point %v out of range %d\n", p, EDGE)
@@ -78,7 +77,7 @@ func setLight(p Point, cmd int) error {
 func ApplyCmd(c Command) error {
 	for i := c.start.x; i <= c.end.x; i++ {
 		for j := c.start.y; j <= c.end.y; j++ {
-			err := setLight(Point{i, j, OFF}, c.cmd)
+			err := setLight(Point{i, j}, c.cmd)
 			if err != nil {
 				return fmt.Errorf("ApplyCmd: %v\n", err)
 			}
@@ -101,7 +100,7 @@ func NumOn() int {
 
 // LineToCmd takes a string from the input file and returns a command struct
 // containing the instruction to execute.
-// lines must match the format: "[turn off|turn on|toggle] N,N through N,N"
+// Lines must match the format: "[turn off|turn on|toggle] N,N through N,N"
 func LineToCmd(line string) (Command, error) {
 	var offset int
 	var c Command
@@ -141,5 +140,5 @@ func parsePoint(point string) (Point, error) {
 		return Point{}, err
 	}
 
-	return Point{x, y, OFF}, nil
+	return Point{x, y}, nil
 }

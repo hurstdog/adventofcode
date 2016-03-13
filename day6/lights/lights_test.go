@@ -7,17 +7,17 @@ var testData map[string]Command = make(map[string]Command)
 
 func init() {
 	testData["turn on 0,0 through 999,999"] =
-		Command{ON, Point{0, 0, OFF}, Point{999, 999, OFF}}
+		Command{ON, Point{0, 0}, Point{999, 999}}
 	testData["turn off 0,0 through 999,999"] =
-		Command{OFF, Point{0, 0, OFF}, Point{999, 999, OFF}}
+		Command{OFF, Point{0, 0}, Point{999, 999}}
 	testData["toggle 0,0 through 999,999"] =
-		Command{TOGGLE, Point{0, 0, OFF}, Point{999, 999, OFF}}
+		Command{TOGGLE, Point{0, 0}, Point{999, 999}}
 	testData["toggle 888,888 through 888,888"] =
-		Command{TOGGLE, Point{888, 888, OFF}, Point{888, 888, OFF}}
+		Command{TOGGLE, Point{888, 888}, Point{888, 888}}
 }
 
 func TestSetLight(t *testing.T) {
-	p := Point{0, 0, OFF}
+	p := Point{0, 0}
 	v, err := getLight(p)
 	expectValue(v, OFF, err, t)
 
@@ -48,7 +48,7 @@ func TestNumOn(t *testing.T) {
 	if n != 0 {
 		t.Errorf("Expected 0 lights on, got %d\n", n)
 	}
-	ApplyCmd(Command{ON, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	ApplyCmd(Command{ON, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
 	n = NumOn()
 	if n != NUM_LIGHTS {
 		t.Errorf("Expected %d lights on, got %d\n", NUM_LIGHTS, n)
@@ -70,16 +70,16 @@ func TestApplyCmd(t *testing.T) {
 
 	assertAllSet(OFF, t)
 
-	ApplyCmd(Command{ON, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	ApplyCmd(Command{ON, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
 	assertAllSet(ON, t)
 
-	ApplyCmd(Command{TOGGLE, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	ApplyCmd(Command{TOGGLE, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
 	assertAllSet(OFF, t)
 
-	ApplyCmd(Command{TOGGLE, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	ApplyCmd(Command{TOGGLE, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
 	assertAllSet(ON, t)
 
-	ApplyCmd(Command{OFF, Point{0, 0, OFF}, Point{EDGE - 1, EDGE - 1, OFF}})
+	ApplyCmd(Command{OFF, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
 	assertAllSet(OFF, t)
 }
 
