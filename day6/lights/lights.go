@@ -32,10 +32,11 @@ type Grid [EDGE][EDGE]int
 // Fun fact: initialized to all off
 var lights Grid
 
-func InitLights() {
+// Used for tests only
+func ResetLights() {
 	for i := 0; i < EDGE; i++ {
 		for j := 0; j < EDGE; j++ {
-			setLight(Point{i, j}, OFF)
+			setLight(Point{i, j}, -1)
 		}
 	}
 }
@@ -58,16 +59,17 @@ func setLight(p Point, cmd int) error {
 		return fmt.Errorf("Point %v out of range %d\n", p, EDGE)
 	}
 	switch cmd {
+	case -1:
+		lights[p.x][p.y] = 0
 	case OFF:
-		lights[p.x][p.y] = OFF
-	case ON:
-		lights[p.x][p.y] = ON
-	case TOGGLE:
-		if lights[p.x][p.y] == OFF {
-			lights[p.x][p.y] = ON
-		} else {
-			lights[p.x][p.y] = OFF
+		lights[p.x][p.y] -= 1
+		if lights[p.x][p.y] < 0 {
+			lights[p.x][p.y] = 0
 		}
+	case ON:
+		lights[p.x][p.y]++
+	case TOGGLE:
+		lights[p.x][p.y] += 2
 	}
 
 	return nil
@@ -86,8 +88,8 @@ func ApplyCmd(c Command) error {
 	return nil
 }
 
-// Returns the number of lights set to ON
-func NumOn() int {
+// Returns the total brightness of lights.
+func TotBrightness() int {
 	var c int
 	for i := 0; i < EDGE; i++ {
 		for j := 0; j < EDGE; j++ {

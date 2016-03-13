@@ -1,6 +1,7 @@
 // Blink follows the instructions in a given input file to turn on and off a
 // grid of lights.
 // Day6 part 1 solution: 400410
+// Day6 part 2 solution: 15343601
 package main
 
 import (
@@ -33,6 +34,6 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error applying line [%s]: %v\n", line, err)
 		}
 	}
-	n := lights.NumOn()
-	fmt.Printf("After all commands, %d are on\n", n)
+	n := lights.TotBrightness()
+	fmt.Printf("After all commands, %d is the total brightness\n", n)
 }

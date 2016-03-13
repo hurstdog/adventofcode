@@ -19,37 +19,47 @@ func init() {
 func TestSetLight(t *testing.T) {
 	p := Point{0, 0}
 	v, err := getLight(p)
-	expectValue(v, OFF, err, t)
+	expectValue(v, 0, err, t)
+
+	// Can't go below 0
+	err = setLight(p, OFF)
+	v, err = getLight(p)
+	expectValue(v, 0, err, t)
 
 	// OFF -> ON
 	err = setLight(p, ON)
 	v, err = getLight(p)
 	expectValue(v, ON, err, t)
 
-	// ON -> OFF
+	// Increase brightness by 1
+	err = setLight(p, ON)
+	v, err = getLight(p)
+	expectValue(v, 2, err, t)
+
+	// Toggle is +2
+	err = setLight(p, TOGGLE)
+	v, err = getLight(p)
+	expectValue(v, 4, err, t)
+
+	// OFF is decrease by 1
 	err = setLight(p, OFF)
 	v, err = getLight(p)
-	expectValue(v, OFF, err, t)
+	expectValue(v, 3, err, t)
 
-	// OFF -> ON
-	err = setLight(p, TOGGLE)
+	// -1 is reset
+	err = setLight(p, -1)
 	v, err = getLight(p)
-	expectValue(v, ON, err, t)
-
-	// ON -> OFF
-	err = setLight(p, TOGGLE)
-	v, err = getLight(p)
-	expectValue(v, OFF, err, t)
+	expectValue(v, 0, err, t)
 }
 
-func TestNumOn(t *testing.T) {
-	InitLights()
-	n := NumOn()
+func TestTotBrightness(t *testing.T) {
+	ResetLights()
+	n := TotBrightness()
 	if n != 0 {
 		t.Errorf("Expected 0 lights on, got %d\n", n)
 	}
 	ApplyCmd(Command{ON, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
-	n = NumOn()
+	n = TotBrightness()
 	if n != NUM_LIGHTS {
 		t.Errorf("Expected %d lights on, got %d\n", NUM_LIGHTS, n)
 	}
@@ -66,21 +76,22 @@ func assertAllSet(v int, t *testing.T) {
 }
 
 func TestApplyCmd(t *testing.T) {
-	InitLights()
+	ResetLights()
 
 	assertAllSet(OFF, t)
 
 	ApplyCmd(Command{ON, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
-	assertAllSet(ON, t)
+	assertAllSet(1, t)
 
 	ApplyCmd(Command{TOGGLE, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
-	assertAllSet(OFF, t)
-
-	ApplyCmd(Command{TOGGLE, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
-	assertAllSet(ON, t)
+	assertAllSet(3, t)
 
 	ApplyCmd(Command{OFF, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
-	assertAllSet(OFF, t)
+	ApplyCmd(Command{OFF, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
+	assertAllSet(1, t)
+
+	ApplyCmd(Command{OFF, Point{0, 0}, Point{EDGE - 1, EDGE - 1}})
+	assertAllSet(0, t)
 }
 
 func expectValue(v int, exp int, err error, t *testing.T) {
