@@ -34,5 +34,5 @@ func main() {
 		}
 	}
 	n := lights.NumOn()
-	fmt.Println("After all commands, %d are on\n", n)
+	fmt.Printf("After all commands, %d are on\n", n)
 }
