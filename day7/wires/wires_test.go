@@ -42,6 +42,33 @@ func TestHandleNot(t *testing.T) {
 	expectValue(handleNot, "NOT x -> h", "h", 65412, t)
 }
 
+func TestHandleOpErrors(t *testing.T) {
+	resetC()
+	e := "Expected op AND|OR|LSHIFT|RSHIFT with 4 tokens, got [x A y -> z]\n"
+	exp := fmt.Errorf(e)
+	expectErr(handleOp, "x A y -> z", exp, t)
+
+	exp = fmt.Errorf("Token x not yet defined, used in [x AND y -> z]\n")
+	expectErr(handleOp, "x AND y -> z", exp, t)
+	handleAssignment("123 -> x")
+	exp = fmt.Errorf("Token y not yet defined, used in [x AND y -> z]\n")
+	expectErr(handleOp, "x AND y -> z", exp, t)
+
+	handleAssignment("123 -> y")
+	handleAssignment("123 -> k")
+	exp = fmt.Errorf("Line [x AND y -> k] assigns to a token that already exists.\n")
+	expectErr(handleOp, "x AND y -> k", exp, t)
+}
+
+func TestHandleOps(t *testing.T) {
+	resetC()
+
+	handleAssignment("123 -> x")
+	handleAssignment("456 -> y")
+	expectValue(handleOp, "x AND y -> d", "d", 72, t)
+	expectValue(handleOp, "x OR y -> e", "e", 507, t)
+}
+
 func expectValue(fn linefunc, s string, k string, v int, t *testing.T) {
 	err := fn(s)
 	if err != nil {

@@ -41,11 +41,48 @@ func RunLine(line string) error {
 	return err
 }
 
+// Processes the case of "x OP y -> z", returning an error on malformed input.
+func handleOp(line string) error {
+	tok := strings.Split(line, " ")
+	if len(tok) != 5 {
+		return fmt.Errorf("Bad token count: expected 5, got %v, from [%v].\n",
+			len(tok), strings.Join(tok, " "))
+	}
+	op := tok[1]
+	if op != "OR" && op != "AND" && op != "RSHIFT" && op != "LSHIFT" {
+		e := "Expected op AND|OR|LSHIFT|RSHIFT with 4 tokens, got [%v]\n"
+		return fmt.Errorf(e, line)
+	}
+	x := tok[0]
+	_, ok := C[x]
+	if !ok {
+		return fmt.Errorf("Token %v not yet defined, used in [%v]\n", x, line)
+	}
+	y := tok[2]
+	_, ok = C[y]
+	if !ok {
+		return fmt.Errorf("Token %v not yet defined, used in [%v]\n", y, line)
+	}
+	z := tok[4]
+	_, ok = C[z]
+	if ok {
+		return fmt.Errorf("Line [%v] assigns to a token that already exists.\n", line)
+	}
+
+	// Now we get to actually doing the calculations
+	if op == "AND" {
+		C[z] = C[x] & C[y]
+	} else if op == "OR" {
+		C[z] = C[x] | C[y]
+	}
+	return nil
+}
+
 // Processes the case of "NOT x -> y", returning an error on malformed input.
 func handleNot(line string) error {
 	tok := strings.Split(line, " ")
 	if len(tok) != 4 {
-		return fmt.Errorf("Too many tokens, expected 4, got %v, from [%v].\n",
+		return fmt.Errorf("Bad token count: expected 4, got %v, from [%v].\n",
 			len(tok), strings.Join(tok, " "))
 	}
 	if tok[0] != "NOT" {
@@ -74,7 +111,7 @@ func handleNot(line string) error {
 func handleAssignment(line string) error {
 	tok := strings.Split(line, " ")
 	if len(tok) != 3 {
-		return fmt.Errorf("Too many tokens, expected 3, got %v, from [%v].\n",
+		return fmt.Errorf("Bad token count: expected 3, got %v, from [%v].\n",
 			len(tok), strings.Join(tok, " "))
 	}
 	if tok[1] != "->" {
