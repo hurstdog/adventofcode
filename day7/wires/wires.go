@@ -59,6 +59,11 @@ func AddLine(line string) {
 // through the lines in any order and effectively depth-first search for only
 // the values we need.
 func DefineValue(x string) error {
+	// If the value is already defined, skip it.
+	_, ok := C[x]
+	if ok {
+		return nil
+	}
 	match := "-> " + x
 	for _, v := range Input {
 		if strings.HasSuffix(v, match) {

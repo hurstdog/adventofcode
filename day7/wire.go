@@ -26,10 +26,21 @@ func main() {
 		}
 		wires.AddLine(buf.Text())
 	}
+	// Part1
+	err = wires.DefineValue("a")
+	aval := wires.C["a"]
+	if err != nil {
+		fmt.Printf("ERROR: %v", err)
+	} else {
+		fmt.Printf("After all commands, wire 'a' gets value %v.\n", aval)
+	}
+	// Part2
+	wires.Reset()
+	wires.C["b"] = aval // override the value to the results of part1
 	err = wires.DefineValue("a")
 	if err != nil {
 		fmt.Printf("ERROR: %v", err)
 	} else {
-		fmt.Printf("After all commands, wire 'a' gets value %v.\n", wires.C["a"])
+		fmt.Printf("For part 2, wire 'a' gets value %v.\n", wires.C["a"])
 	}
 }
