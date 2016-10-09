@@ -34,6 +34,8 @@ func RunLine(line string) error {
 		return handleAssignment(line)
 	} else if tokl == 4 {
 		return handleNot(line)
+	} else if tokl == 5 {
+		return handleOp(line)
 	} else {
 		return fmt.Errorf("Line [%v] has too many tokens.\n", line)
 	}
