@@ -89,7 +89,7 @@ func TestHandleOps(t *testing.T) {
 	expectValue(handleOp, "y RSHIFT 2 -> g", "g", 114, t)
 }
 
-func expectValue(fn linefunc, s string, k string, v int, t *testing.T) {
+func expectValue(fn linefunc, s string, k string, v uint16, t *testing.T) {
 	err := fn(s)
 	if err != nil {
 		t.Error(err)

@@ -19,7 +19,7 @@ const MASK16 = 0xFFFF
 // We'll update each value as we process through the file.
 
 // Circuit. var -> value
-var C map[string]int = make(map[string]int)
+var C map[string]uint16 = make(map[string]uint16)
 
 // Input file, kept around for reference.
 var Input []string
@@ -62,10 +62,12 @@ func DefineValue(x string) error {
 	match := "-> " + x
 	for _, v := range Input {
 		if strings.HasSuffix(v, match) {
+			//fmt.Printf("Running line[%v] (%v) to define %v.\n", i, v, x)
 			err := RunLine(v)
 			if err != nil {
 				return err
 			}
+			//fmt.Printf("%v = %v.\n", x, C[x])
 			break
 		}
 	}
@@ -147,9 +149,9 @@ func handleOp(line string) error {
 	} else {
 		ynum, _ := strconv.Atoi(y)
 		if op == "LSHIFT" {
-			C[z] = (C[x] << uint(ynum)) & MASK16
+			C[z] = uint16((C[x] << uint(ynum)) & MASK16)
 		} else if op == "RSHIFT" {
-			C[z] = (C[x] >> uint(ynum)) & MASK16
+			C[z] = uint16((C[x] >> uint(ynum)) & MASK16)
 		}
 	}
 	return nil
@@ -199,18 +201,18 @@ func handleAssignment(line string) error {
 			strings.Join(tok, " "))
 	}
 	val, err := strconv.Atoi(tok[0])
+	val16 := uint16(val)
 	// If it's not a number, then it's a variable. Fetch it or define it.
 	if err != nil {
-		v, ok := C[tok[0]]
+		fetched, ok := C[tok[0]]
 		if ok {
-			val = v
+			val16 = fetched
 		} else {
 			err = DefineValue(tok[0])
 			if err != nil {
 				return err
 			}
-			// Fake that it's a number.
-			val = C[tok[0]]
+			val16 = C[tok[0]]
 		}
 	}
 	id := tok[2]
@@ -219,6 +221,6 @@ func handleAssignment(line string) error {
 		return fmt.Errorf("Line [%v] assigns to a token that already exists.\n",
 			strings.Join(tok, " "))
 	}
-	C[id] = val
+	C[id] = val16
 	return nil
 }
