@@ -61,7 +61,12 @@ func handleOp(line string) error {
 	y := tok[2]
 	_, ok = C[y]
 	if !ok {
-		return fmt.Errorf("Token %v not yet defined, used in [%v]\n", y, line)
+		// Allow plain numbers in LSHIFT and RSHIFT
+		_, err := strconv.Atoi(y)
+		valid := err == nil && (op == "LSHIFT" || op == "RSHIFT")
+		if !valid {
+			return fmt.Errorf("Token %v not yet defined, used in [%v]\n", y, line)
+		}
 	}
 	z := tok[4]
 	_, ok = C[z]
@@ -74,6 +79,13 @@ func handleOp(line string) error {
 		C[z] = C[x] & C[y]
 	} else if op == "OR" {
 		C[z] = C[x] | C[y]
+	} else {
+		ynum, _ := strconv.Atoi(y)
+		if op == "LSHIFT" {
+			C[z] = (C[x] << uint(ynum)) & MASK16
+		} else if op == "RSHIFT" {
+			C[z] = (C[x] >> uint(ynum)) & MASK16
+		}
 	}
 	return nil
 }

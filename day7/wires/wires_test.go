@@ -67,6 +67,8 @@ func TestHandleOps(t *testing.T) {
 	handleAssignment("456 -> y")
 	expectValue(handleOp, "x AND y -> d", "d", 72, t)
 	expectValue(handleOp, "x OR y -> e", "e", 507, t)
+	expectValue(handleOp, "x LSHIFT 2 -> f", "f", 492, t)
+	expectValue(handleOp, "y RSHIFT 2 -> g", "g", 114, t)
 }
 
 func expectValue(fn linefunc, s string, k string, v int, t *testing.T) {
