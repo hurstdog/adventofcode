@@ -1,6 +1,6 @@
 // Wire follows the instructions in a given input file to calculate a wiring
 // diagram.
-// Day 7 part 1 solution:
+// Day 7 part 1 solution: 3176
 // Day 7 part 2 solution:
 package main
 

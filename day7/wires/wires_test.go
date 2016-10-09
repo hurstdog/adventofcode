@@ -42,6 +42,12 @@ func TestDefineValue(t *testing.T) {
 	}
 }
 
+func TestNumericOr(t *testing.T) {
+	Load(testFileR)
+	handleAssignment("0 -> c")
+	expectValue(handleOp, "1 OR c -> n", "n", 1, t)
+}
+
 func TestHandleAssignment(t *testing.T) {
 	Load(testFileR)
 	expectValue(handleAssignment, "123 -> x", "x", 123, t)

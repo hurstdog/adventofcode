@@ -62,7 +62,7 @@ func DefineValue(x string) error {
 	match := "-> " + x
 	for _, v := range Input {
 		if strings.HasSuffix(v, match) {
-			//fmt.Printf("Running line[%v] (%v) to define %v.\n", i, v, x)
+			//fmt.Printf("Running line [%v] to define %v.\n", v, x)
 			err := RunLine(v)
 			if err != nil {
 				return err
@@ -115,37 +115,26 @@ func handleOp(line string) error {
 		return fmt.Errorf(e, line)
 	}
 	x := tok[0]
-	_, ok := C[x]
-	if !ok {
-		err = DefineValue(x)
-		if err != nil {
-			return err
-		}
+	xval, err := resolve(x)
+	if err != nil {
+		return err
 	}
 	y := tok[2]
-	_, ok = C[y]
-	if !ok {
-		// Allow plain numbers in LSHIFT and RSHIFT
-		_, err := strconv.Atoi(y)
-		valid := err == nil && (op == "LSHIFT" || op == "RSHIFT")
-		if !valid {
-			err = DefineValue(y)
-			if err != nil {
-				return err
-			}
-		}
+	yval, err := resolve(y)
+	if err != nil {
+		return err
 	}
 	z := tok[4]
-	_, ok = C[z]
+	_, ok := C[z]
 	if ok {
 		return fmt.Errorf("Line [%v] assigns to a token that already exists.\n", line)
 	}
 
 	// Now we get to actually doing the calculations
 	if op == "AND" {
-		C[z] = C[x] & C[y]
+		C[z] = xval & yval
 	} else if op == "OR" {
-		C[z] = C[x] | C[y]
+		C[z] = xval | yval
 	} else {
 		ynum, _ := strconv.Atoi(y)
 		if op == "LSHIFT" {
@@ -168,19 +157,16 @@ func handleNot(line string) error {
 		return fmt.Errorf("Expected /^NOT.*/ with 4 tokens, got /%v/\n", line)
 	}
 	k := tok[1]
-	v, ok := C[k]
-	if !ok {
-		err := DefineValue(k)
-		if err != nil {
-			return err
-		}
+	v, err := resolve(k)
+	if err != nil {
+		return err
 	}
 	if tok[2] != "->" {
 		return fmt.Errorf("4 tokens implies '->' is the third, it isn't: [%v].\n",
 			strings.Join(tok, " "))
 	}
 	id := tok[3]
-	_, ok = C[id]
+	_, ok := C[id]
 	if ok {
 		return fmt.Errorf("Line [%v] assigns to a token that already exists.\n",
 			strings.Join(tok, " "))
@@ -223,4 +209,27 @@ func handleAssignment(line string) error {
 	}
 	C[id] = val16
 	return nil
+}
+
+// resolve returns the string as a number, if it's a number. Otherwise it
+// finds the definition of the variable and returns that.
+func resolve(s string) (uint16, error) {
+	// If it exists, return it
+	val, ok := C[s]
+	if ok {
+		return val, nil
+	}
+
+	// If it's a number, return that.
+	num, err := strconv.Atoi(s)
+	if err == nil {
+		return uint16(num), nil
+	}
+
+	// better define it
+	err = DefineValue(s)
+	if err != nil {
+		return 0, err
+	}
+	return C[s], nil
 }
