@@ -24,15 +24,12 @@ func main() {
 		if !buf.Scan() {
 			break
 		}
-		line := buf.Text()
-		// NOTE: Don't run the line here. Need to effectively bubble sort the list
-		// first. Read in all the lines. Then push each line further down until
-		// it's one past the token it gets defined in.
-		err := wires.RunLine(line)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error parsing line [%s]: %v\n", line, err)
-		}
+		wires.AddLine(buf.Text())
 	}
-	a := wires.C["a"]
-	fmt.Printf("After all commands, wire 'a' gets value %v.\n", a)
+	err = wires.DefineValue("a")
+	if err != nil {
+		fmt.Printf("ERROR: %v", err)
+	} else {
+		fmt.Printf("After all commands, wire 'a' gets value %v.\n", wires.C["a"])
+	}
 }

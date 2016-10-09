@@ -18,13 +18,69 @@ const MASK16 = 0xFFFF
 // Need a lookup table of each op. map[string]int
 // We'll update each value as we process through the file.
 
-// Circuit
+// Circuit. var -> value
 var C map[string]int = make(map[string]int)
+
+// Input file, kept around for reference.
+var Input []string
+
+// Lines that have been seen, to prevent double-processing.
+var Seen map[string]bool = make(map[string]bool)
 
 // A common signature for all line processing functions
 type linefunc func(string) error
 
+// Clears the Circuit, Seen, and input File
+func Reset() {
+	for k, _ := range C {
+		delete(C, k)
+	}
+	for k, _ := range Seen {
+		delete(Seen, k)
+	}
+	Input = nil
+}
+
+// Loads the given slice into our tracker slice.
+func Load(lines []string) {
+	Reset()
+	Input = make([]string, len(lines))
+	copy(Input, lines)
+}
+
+// Adds a single line into our tracker slice
+func AddLine(line string) {
+	Input = append(Input, line)
+}
+
+// This loops over all of the lines in the file and processes the line that
+// defines the variable in x next.
+// Coupled with skipping lines we've already processed, this allows us to go
+// through the lines in any order and effectively depth-first search for only
+// the values we need.
+func DefineValue(x string) error {
+	match := "-> " + x
+	for _, v := range Input {
+		if strings.HasSuffix(v, match) {
+			err := RunLine(v)
+			if err != nil {
+				return err
+			}
+			break
+		}
+	}
+	return nil
+}
+
 func RunLine(line string) error {
+	// Skip lines we've already seen.
+	_, ok := Seen[line]
+	if ok {
+		return nil
+	}
+
+	Seen[line] = true
+
 	var err error
 	// num tokens is the number of spaces + 1
 	tokl := strings.Count(line, " ") + 1
@@ -45,6 +101,7 @@ func RunLine(line string) error {
 
 // Processes the case of "x OP y -> z", returning an error on malformed input.
 func handleOp(line string) error {
+	var err error
 	tok := strings.Split(line, " ")
 	if len(tok) != 5 {
 		return fmt.Errorf("Bad token count: expected 5, got %v, from [%v].\n",
@@ -58,7 +115,10 @@ func handleOp(line string) error {
 	x := tok[0]
 	_, ok := C[x]
 	if !ok {
-		return fmt.Errorf("Token %v not yet defined, used in [%v]\n", x, line)
+		err = DefineValue(x)
+		if err != nil {
+			return err
+		}
 	}
 	y := tok[2]
 	_, ok = C[y]
@@ -67,7 +127,10 @@ func handleOp(line string) error {
 		_, err := strconv.Atoi(y)
 		valid := err == nil && (op == "LSHIFT" || op == "RSHIFT")
 		if !valid {
-			return fmt.Errorf("Token %v not yet defined, used in [%v]\n", y, line)
+			err = DefineValue(y)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	z := tok[4]
@@ -105,7 +168,10 @@ func handleNot(line string) error {
 	k := tok[1]
 	v, ok := C[k]
 	if !ok {
-		return fmt.Errorf("Token %v not yet defined, used in [%v]\n", k, line)
+		err := DefineValue(k)
+		if err != nil {
+			return err
+		}
 	}
 	if tok[2] != "->" {
 		return fmt.Errorf("4 tokens implies '->' is the third, it isn't: [%v].\n",
@@ -133,8 +199,19 @@ func handleAssignment(line string) error {
 			strings.Join(tok, " "))
 	}
 	val, err := strconv.Atoi(tok[0])
+	// If it's not a number, then it's a variable. Fetch it or define it.
 	if err != nil {
-		return err
+		v, ok := C[tok[0]]
+		if ok {
+			val = v
+		} else {
+			err = DefineValue(tok[0])
+			if err != nil {
+				return err
+			}
+			// Fake that it's a number.
+			val = C[tok[0]]
+		}
 	}
 	id := tok[2]
 	_, ok := C[id]
