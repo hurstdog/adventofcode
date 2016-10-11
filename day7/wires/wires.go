@@ -3,6 +3,7 @@ package wires
 
 import (
 	"fmt"
+	"github.com/golang/glog"
 	"strconv"
 	"strings"
 )
@@ -13,10 +14,6 @@ const MASK16 = 0xFFFF
 // const -> x
 // x [AND|OR|LSHIFT|RSHIFT] y -> z
 // [NOT] x -> y
-
-// Need to be able to parse a line and turn that into a set of up to two ops
-// Need a lookup table of each op. map[string]int
-// We'll update each value as we process through the file.
 
 // Circuit. var -> value
 var C map[string]uint16 = make(map[string]uint16)
@@ -30,7 +27,7 @@ var Seen map[string]bool = make(map[string]bool)
 // A common signature for all line processing functions
 type linefunc func(string) error
 
-// Clears the Circuit, Seen, and input File
+// Clears the Circuit & Seen
 func Reset() {
 	for k, _ := range C {
 		delete(C, k)
@@ -38,6 +35,10 @@ func Reset() {
 	for k, _ := range Seen {
 		delete(Seen, k)
 	}
+}
+
+// Clears the input file for a re-load
+func ResetInput() {
 	Input = nil
 }
 
@@ -55,24 +56,29 @@ func AddLine(line string) {
 
 // This loops over all of the lines in the file and processes the line that
 // defines the variable in x next.
-// Coupled with skipping lines we've already processed, this allows us to go
-// through the lines in any order and effectively depth-first search for only
-// the values we need.
+// Coupled with skipping lines we've already processed, this allows us to
+// depth-first search for only the values we need.
 func DefineValue(x string) error {
+	if x == "b" || x == "a" {
+		glog.V(2).Infof("Checking %v, C['%v'] == %v.\n", x, x, C[x])
+	}
 	// If the value is already defined, skip it.
 	_, ok := C[x]
 	if ok {
+		if x == "b" || x == "a" {
+			glog.V(2).Infof("Skipping %v, as it's already set to %v.\n", x, C[x])
+		}
 		return nil
 	}
 	match := "-> " + x
 	for _, v := range Input {
 		if strings.HasSuffix(v, match) {
-			//fmt.Printf("Running line [%v] to define %v.\n", v, x)
+			glog.V(2).Infof("Running line [%v] to define %v.\n", v, x)
 			err := RunLine(v)
 			if err != nil {
 				return err
 			}
-			//fmt.Printf("%v = %v.\n", x, C[x])
+			glog.V(2).Infof("%v = %v.\n", x, C[x])
 			break
 		}
 	}

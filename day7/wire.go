@@ -1,11 +1,12 @@
 // Wire follows the instructions in a given input file to calculate a wiring
 // diagram.
 // Day 7 part 1 solution: 3176
-// Day 7 part 2 solution:
+// Day 7 part 2 solution: 14710
 package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"github.com/hurstdog/adventofcode/day7/wires"
 	"os"
@@ -14,6 +15,7 @@ import (
 const INPUT = "input.txt"
 
 func main() {
+	flag.Parse()
 	f, err := os.Open(INPUT)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading %s: %v\n", INPUT, err)

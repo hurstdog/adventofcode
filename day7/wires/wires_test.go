@@ -26,8 +26,12 @@ func TestResetC(t *testing.T) {
 			Input[3], testFileR[3])
 	}
 	Reset()
+	if len(Input) == 0 {
+		t.Errorf("Reset failed: expected length != 0, got %v\n", len(Input))
+	}
+	ResetInput()
 	if len(Input) != 0 {
-		t.Errorf("Reset failed: expected length 0, got %v\n", len(Input))
+		t.Errorf("ResetInput failed: expected length == 0, got %v\n", len(Input))
 	}
 }
 
