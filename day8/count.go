@@ -1,5 +1,5 @@
 // Count counts the characters in the day8 puzzle.
-// Day 8 part 1: Literals: 6202, Memory: 4860
+// Day 8 part 1: Literals: 6202, Memory: 4860; difference: 1342
 // Day 8 part 2: 
 package main
 
