@@ -5,7 +5,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/hurstdog/adventofcode/day5/nice"
+	"github.com/hurstdog/adventofcode/2015/day5/nice"
 	"os"
 )
 

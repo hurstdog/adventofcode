@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/hurstdog/adventofcode/day2/wrapping"
+	"github.com/hurstdog/adventofcode/2015/day2/wrapping"
 	"io/ioutil"
 	"os"
 	"strings"

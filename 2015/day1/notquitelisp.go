@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/hurstdog/adventofcode/day1/parens"
+	"github.com/hurstdog/adventofcode/2015/day1/parens"
 	"io/ioutil"
 	"os"
 )

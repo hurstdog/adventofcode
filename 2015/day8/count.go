@@ -7,7 +7,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/hurstdog/adventofcode/day8/counter"
+	"github.com/hurstdog/adventofcode/2015/day8/counter"
 	"os"
 )
 

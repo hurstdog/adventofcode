@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/hurstdog/adventofcode/day3/nav"
+	"github.com/hurstdog/adventofcode/2015/day3/nav"
 	"io/ioutil"
 	"os"
 )

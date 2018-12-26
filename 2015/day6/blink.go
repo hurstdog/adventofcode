@@ -7,7 +7,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/hurstdog/adventofcode/day6/lights"
+	"github.com/hurstdog/adventofcode/2015/day6/lights"
 	"os"
 )
 
