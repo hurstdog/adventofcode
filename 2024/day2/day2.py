@@ -2,7 +2,7 @@
 # open the file
 f = open("2024/day2/input.txt", "r")
 
-stoppoint = 3
+stoppoint = 10000
 safe_count = 0
 unsafe_count = 0
 
@@ -50,7 +50,7 @@ for line in f:
         #print("safe")
         safe_count += 1
 
-    # stop after 10 lines
+    # stop after stopppoint lines
     stoppoint -= 1
     if stoppoint <= 0:
         break
