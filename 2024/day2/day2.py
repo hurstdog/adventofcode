@@ -85,6 +85,7 @@ for line in f:
         break
 
 # Part 1 solution: 224 safe, 776 unsafe
+# Part 2 solution: 293 safe, 707 unsafe
 print("Safe lines: %d" % safe_count)
 print("Unsafe lines: %d" % unsafe_count)
 
