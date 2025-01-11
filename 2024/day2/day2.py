@@ -15,21 +15,25 @@ for line in f:
     prev_num = 0   # warning: if there's a zero in the input, this will fail
     line_increase = False
     line_decrease = False
-    no_change = False
+    unsafe_delta = False
     for p in parts:
-        print("found number %d" % int(p))
+        #print("found number %d" % int(p))
         
         if prev_num != 0:
-            # now I can compare
+            # now I can compare the jump
+            diff = abs(prev_num - int(p))
+            if diff > 3 or diff < 1:
+                #print("unsafe delta")
+                unsafe_delta = True
+                break
+
+            # now I can compare the direction
             if prev_num < int(p):
-                print("increasing")
+                #print("increasing")
                 line_increase = True
             elif prev_num > int(p):
-                print("decreasing")
+                #print("decreasing")
                 line_decrease = True
-            else:
-                print("same")
-                no_change = True
 
         prev_num = int(p)
     
@@ -37,14 +41,13 @@ for line in f:
     # gradually decreasing or increasing
     # change at least one, never more than three
     if line_increase and line_decrease:
-        print("unsafe")
+        #print("unsafe")
         unsafe_count += 1
-    elif no_change:
-        # any pair of numbers side by side is unsafe
-        print("unsafe")
+    elif unsafe_delta:
+        #print("unsafe")
         unsafe_count += 1
     else:
-        print("safe")
+        #print("safe")
         safe_count += 1
 
     # stop after 10 lines
