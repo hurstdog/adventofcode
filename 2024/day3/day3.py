@@ -12,38 +12,17 @@ class Day3Reader:
     all_text: str - contains the full input text from a day3 file.
     """
     def __init__(self, all_text):
-        self.all_text = all_text
-        self.i = 0      # pointer into the string
-        self.text_len = len(all_text)
         self.sum = 0
 
         pattern = re.compile(r'mul\(\d+,\d+\)')
-        self.matches = pattern.findall(self.all_text)
+        self.matches = pattern.findall(all_text)
         self.match_idx = 0
-
-    """
-    Returns the index of the next command start after the given index,
-    or -1 if we've read off the end of the input.
-    """
-    def findCommandStartFromIndex(self, index):
-        # skip to the next mul( start.
-        cur_index = index
-        while ((cur_index + 4) < self.text_len and 
-               self.all_text[cur_index:cur_index+4] != "mul("):
-            cur_index += 1
-
-        # Return error if we've read off the end of the string.
-        if (cur_index + 4) >= self.text_len:
-            return -1
-        
-        return cur_index
 
     """
     Consumes the input text and returns the next command in the string or ""
     if there is no more commands.
     """
     def returnNextCommand(self):
-
         if self.match_idx < len(self.matches):
             cmd = self.matches[self.match_idx]
             self.match_idx += 1
