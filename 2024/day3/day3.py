@@ -17,6 +17,10 @@ class Day3Reader:
         self.text_len = len(all_text)
         self.sum = 0
 
+        pattern = re.compile(r'mul\(\d+,\d+\)')
+        self.matches = pattern.findall(self.all_text)
+        self.match_idx = 0
+
     """
     Returns the index of the next command start after the given index,
     or -1 if we've read off the end of the input.
@@ -39,42 +43,15 @@ class Day3Reader:
     if there is no more commands.
     """
     def returnNextCommand(self):
-        # start from last iteration point, and keep reading until we find
-        # the start of a command. Continue, skipping characters that are 
-        # invalid, unless we see the start of another command ("mul(")
-        cmd = ""
-        # skip to the next mul( start.
-        potential_index = self.findCommandStartFromIndex(self.i)
-        if potential_index < 0:
-            return ""
-        self.i = potential_index
 
-        # read until closing paren, but don't loop forever
-        # this should say command length
-        cmd_len = 3
-        while ((self.i + cmd_len) < self.text_len and
-               self.all_text[self.i+cmd_len] != ")"):
-            cmd_len += 1
-            #print(f"Current Command: '{self.all_text[self.i:self.i+cmd_len+1]}'")
-            # if we find a new command starting, then fast forward to that
-            # and restart.
-            if self.all_text[self.i+cmd_len+1-4:self.i+cmd_len+1] == "mul(":
-                # found a new command!
-                # hack it up, and recurse
-                self.i = self.i+cmd_len + 1 - 4
-                return self.returnNextCommand()
-        
-        #print(f"i: {self.i}, cmd_len: {cmd_len}")
+        if self.match_idx < len(self.matches):
+            cmd = self.matches[self.match_idx]
+            self.match_idx += 1
+            print(f"Current Command: '{cmd}'")
+            return cmd
 
-        # build the command
-        cmd = self.all_text[self.i:self.i+cmd_len+1]
-        print(f"Current Command: '{cmd}'")
+        return ""
 
-        # update the next position to start
-        self.i = self.i + cmd_len + 1
-        
-        return cmd
-    
     def getProductFromCommand(self, cmd):
         match = re.search(r'mul\((\d+),(\d+)\)', cmd)
         if match:
