@@ -12,9 +12,12 @@ class Day3Reader:
     all_text: str - contains the full input text from a day3 file.
     """
     def __init__(self, all_text):
-        self.sum = 0
 
-        pattern = re.compile(r'mul\(\d+,\d+\)')
+        self.part1sum = 0
+        self.part2sum = 0
+
+        # find mul(\d+,\d+), or do(), or don't()
+        pattern = re.compile(r'(mul\(\d+,\d+\)|do\(\)|don\'t\(\))')
         self.matches = pattern.findall(all_text)
         self.match_idx = 0
 
@@ -22,12 +25,26 @@ class Day3Reader:
     Consumes the input text and returns the next command in the string or ""
     if there is no more commands.
     """
-    def returnNextCommand(self):
-        if self.match_idx < len(self.matches):
+    def returnNextMulCommand(self):
+        skipMul = False
+        while self.match_idx < len(self.matches):
             cmd = self.matches[self.match_idx]
             self.match_idx += 1
             print(f"Current Command: '{cmd}'")
-            return cmd
+
+            # if we found a mul, return it
+            if cmd.startswith("mul") and not skipMul:
+                return cmd
+            
+            # if we found a do, we can start returning mul() again
+            if cmd.startswith("do"):
+                print(f"do'ing mul again")
+                skipMul = False
+
+            # if we found a don't, we should stop returning mul() commands
+            if cmd.startswith("don't"):
+                print(f"NO MORE mul")
+                skipMul = True
 
         return ""
 
@@ -42,17 +59,17 @@ class Day3Reader:
     # Yes, it's bad form to have the caller update the class' instance
     # variables.
     def updateSum(self, product):
-        self.sum += product
+        self.part1sum += product
 
     def totalSum(self):
-        return self.sum
+        return self.part1sum
     
     def calculateSum(self):
-        cmd = self.returnNextCommand()
+        cmd = self.returnNextMulCommand()
         while cmd != "":
             product = self.getProductFromCommand(cmd)
             self.updateSum(product)
-            cmd = self.returnNextCommand()
+            cmd = self.returnNextMulCommand()
         return self.totalSum()
 
 
@@ -66,7 +83,24 @@ def testDay3():
     test_products = [8, 25, 88, 40]
     test_total = sum(test_products)
     for idx in range(len(test_cmds)):
-        cmd = dr.returnNextCommand()
+        cmd = dr.returnNextMulCommand()
+        assert cmd == test_cmds[idx], f"FAIL: cmd is '{cmd}', but expected '{test_cmds[idx]}'"
+        product = dr.getProductFromCommand(cmd)
+        assert product == test_products[idx], f"FAIL: product is '{product}', but expected '{test_products[idx]}'"
+        dr.updateSum(product)
+    
+    assert test_total == dr.totalSum(), f"FAIL: total is '{dr.totalSum()}', but expected '{test_total}'"
+
+def testDay3Part2():
+    input_test = ("xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64]" +
+                  "(mul(11,8)undo()?mul(8,5))")
+    dr = Day3Reader(input_test)
+
+    test_cmds = ["mul(2,4)", "mul(8,5)"]
+    test_products = [8, 40]
+    test_total = sum(test_products)
+    for idx in range(len(test_cmds)):
+        cmd = dr.returnNextMulCommand()
         assert cmd == test_cmds[idx], f"FAIL: cmd is '{cmd}', but expected '{test_cmds[idx]}'"
         product = dr.getProductFromCommand(cmd)
         assert product == test_products[idx], f"FAIL: product is '{product}', but expected '{test_products[idx]}'"
@@ -82,6 +116,8 @@ def executeDay3():
     print(f"Total sum from text is {sum}")
 
 testDay3()
+testDay3Part2()
 executeDay3()
 
-# day 1 part 1 answer: 159892596
+# day 3 part 1 answer: 159892596
+# day 3 part 2 answer: 92626942
