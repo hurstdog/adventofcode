@@ -4,8 +4,7 @@
 import re
 
 INPUT = "2024/day4/input.txt"
-LINELEN = 140       # number of characters per line
-DEBUG = True
+DEBUG = False
 
 _EXAMPLE_TEXT = """
 MMMSXXMASM
@@ -231,8 +230,8 @@ def countAll(input_arr):
     return count
 
 def main():
-    #i = getInput()
-    i = getExampleInput()
+    i = getFileInput()              # Part 1 - 2358
+    #i = getExampleInput()
     c = countAll(i)
     print(f"count is {c}")
 
