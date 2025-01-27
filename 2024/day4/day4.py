@@ -25,62 +25,88 @@ _EX_RTL = 2
 _EX_DOWN = 1
 _EX_UP = 2
 _EX_DIAG_SE = 1
-_EX_DIAG_BWD = 0
+_EX_DIAG_NE = 4
+_EX_DIAG_NW = 4
+_EX_DIAG_SW = 1
 _EX_TOTAL = 18
 
+# Return file as array of arrays, each character it's own element
 def getFileInput():
     f = open(INPUT, "r")
     l = f.read()
-    return l.join("").replace("\n", "")
+    arr = []
+    for line in l.splitlines():
+        if len(line) == 0:
+            continue
+        arr.append(list(line))
+    return arr
 
 def getExampleInput():
-    # if we're using example input, reset the global line length to 10
-    global LINELEN
-    LINELEN = 10
+    arr = []
+    for line in _EXAMPLE_TEXT.splitlines():
+        if len(line) == 0:
+            continue
+        arr.append(list(line))
+    return arr
 
-    x = _EXAMPLE_TEXT
-    x.join("")
-    x = x.replace("\n", "")
-    return x
+"""
+Looks for XMAS at the given positions. Put into a separate function to
+minimize error handling code elsewhere.
+"""
+def matchInArray(input_arr, x_r, x_c, m_r, m_c, a_r, a_c, s_r, s_c):
+    # Don't go below zero
+    if (x_r < 0 or x_c < 0 or
+        m_r < 0 or m_c < 0 or
+        a_r < 0 or a_c < 0 or
+        s_r < 0 or s_c < 0):
+        return False
+    # if we bounce off the end of the main arrays, return false
+    if (x_r >= len(input_arr) or
+        m_r >= len(input_arr) or
+        a_r >= len(input_arr) or
+        s_r >= len(input_arr)):
+        return False
+    # if we bounce off the end of the subarrays, return false
+    if (x_c >= len(input_arr[x_r]) or
+        m_c >= len(input_arr[m_r]) or
+        a_c >= len(input_arr[a_r]) or
+        s_c >= len(input_arr[s_r])):
+        return False
+    
+    return (input_arr[x_r][x_c] == "X" and
+            input_arr[m_r][m_c] == "M" and
+            input_arr[a_r][a_c] == "A" and
+            input_arr[s_r][s_c] == "S")
 
-def matchAtIndex(text, x, m, a, s):
-    return (text[x] == "X" and
-            text[m] == "M" and
-            text[a] == "A" and
-            text[s] == "S")
+"""
+Given a two-dimensional array of characters, goes through every element and looks for "XMAS" starting at the given element. The offsets specify where to find MAS, assuming the first element is X. This is why we only have the offsets for MAS, and not X.
+"""
+def countByOffsetInArray(input_arr, m_r, m_c, a_r, a_c, s_r, s_c):
+    # if text is a string, return 0
+    # DELETE THIS
+    if type(input_arr) == str:
+        return 0
 
-def countByOffset(text, x_i, m_i, a_i, s_i):
     count = 0
-    for i in range(len(text)):
-
-        # Skip anything that would cause out of bounds
-        if (i + x_i < 0 or
-            i + s_i < 0):
-            continue
-        if (i + x_i >= len(text) or
-            i + s_i >= len(text)):
-            continue
-
-        if matchAtIndex(text,
-                        i + x_i,
-                        i + m_i,
-                        i + a_i,
-                        i + s_i):
-            count += 1
+    # for each row
+    for r in range(len(input_arr)):
+        # for each column
+        for c in range(len(input_arr[r])):
+            if input_arr[r][c] == "X":
+                if matchInArray(input_arr,
+                                r, c,               # x position
+                                r + m_r, c + m_c,   # m position
+                                r + a_r, c + a_c,   # a position
+                                r + s_r, c + s_c):  # s position
+                    count += 1
     return count
 
-def countRTL(text):
-    count = countByOffset(text, 0, -1, -2, -3)
-
-    if DEBUG:
-        print(f"countRTL: {count}")
-        if count != _EX_RTL:
-            print(f"FAIL: RTL is {count}, but expected {_EX_RTL}")
-
-    return count
-
-def countLTR(text):
-    count = countByOffset(text, 0, 1, 2, 3)
+def countLTR(input_arr):
+    # only increment the column counter
+    count = countByOffsetInArray(input_arr,
+                                 0, 1,
+                                 0, 2,
+                                 0, 3)
 
     if DEBUG:
         print(f"countLTR: {count}")
@@ -89,9 +115,26 @@ def countLTR(text):
 
     return count
 
-def countDown(text):
-    # down will have each character exactly LINELEN apart, forwards
-    count = countByOffset(text, 0, LINELEN, LINELEN * 2, LINELEN * 3)
+def countRTL(input_arr):
+    # only decrement the column counter
+    count = countByOffsetInArray(input_arr,
+                                 0, -1,
+                                 0, -2,
+                                 0, -3)
+
+    if DEBUG:
+        print(f"countRTL: {count}")
+        if count != _EX_RTL:
+            print(f"FAIL: RTL is {count}, but expected {_EX_RTL}")
+
+    return count
+
+def countDown(input_arr):
+    # only increment the row counter
+    count = countByOffsetInArray(input_arr,
+                                 1, 0,
+                                 2, 0,
+                                 3, 0)
 
     if DEBUG:
         print(f"countDown: {count}")
@@ -100,9 +143,12 @@ def countDown(text):
 
     return count
 
-def countUp(text):
-    # up will have each character exactly LINELEN apart, backwards
-    count = countByOffset(text, LINELEN * 3, LINELEN * 2, LINELEN, 0)
+def countUp(input_arr):
+    # only decrement the row counter
+    count = countByOffsetInArray(input_arr,
+                                 -1, 0,
+                                 -2, 0,
+                                 -3, 0)
 
     if DEBUG:
         print(f"countUp: {count}")
@@ -111,13 +157,12 @@ def countUp(text):
 
     return count
 
-def countDiagSE(text):
-    # DiagSE will have increasing down and to the right, +10, +11, +12.
-    count = countByOffset(text,
-                          0,
-                          LINELEN + 1,
-                          (2*LINELEN) + 2,
-                          (3*LINELEN) + 3)
+def countDiagSE(input_arr):
+    # DiagSE will have increasing down and to the right.
+    count = countByOffsetInArray(input_arr,
+                                 1, 1,
+                                 2, 2,
+                                 3, 3)
 
     if DEBUG:
         print(f"countDiagSE: {count}")
@@ -126,13 +171,33 @@ def countDiagSE(text):
 
     return count
 
+def countDiagNE(input_arr):
+    # Row goes down, column goes up
+    count = countByOffsetInArray(input_arr,
+                                 -1, 1,
+                                 -2, 2,
+                                 -3, 3)
+
+    if DEBUG:
+        print(f"countDiagNE: {count}")
+        if count != _EX_DIAG_NE:
+            print(f"FAIL: DIAG_NE is {count}, but expected {_EX_DIAG_NE}")
+
+    return count
+
 def countAll(text):
     count = 0
-    count += countRTL(text)
     count += countLTR(text)
+    count += countRTL(text)
     count += countDown(text)
     count += countUp(text)
     count += countDiagSE(text)
+    count += countDiagNE(text)
+
+    if DEBUG:
+        print(f"countAll: {count}")
+        if count != _EX_TOTAL:
+            print(f"FAIL: TOTAL is {count}, but expected {_EX_TOTAL}")
     return count
 
 def main():
