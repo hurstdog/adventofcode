@@ -24,7 +24,7 @@ _EX_LTR = 3
 _EX_RTL = 2
 _EX_DOWN = 1
 _EX_UP = 2
-_EX_DIAG_FWD = 6  # wrong
+_EX_DIAG_SE = 1
 _EX_DIAG_BWD = 0
 _EX_TOTAL = 18
 
@@ -43,11 +43,34 @@ def getExampleInput():
     x = x.replace("\n", "")
     return x
 
-def countRTL(text):
+def matchAtIndex(text, x, m, a, s):
+    return (text[x] == "X" and
+            text[m] == "M" and
+            text[a] == "A" and
+            text[s] == "S")
+
+def countByOffset(text, x_i, m_i, a_i, s_i):
     count = 0
-    for i in range(len(text) - 3):
-        if text[i:i+4] == "SAMX":
+    for i in range(len(text)):
+
+        # Skip anything that would cause out of bounds
+        if (i + x_i < 0 or
+            i + s_i < 0):
+            continue
+        if (i + x_i >= len(text) or
+            i + s_i >= len(text)):
+            continue
+
+        if matchAtIndex(text,
+                        i + x_i,
+                        i + m_i,
+                        i + a_i,
+                        i + s_i):
             count += 1
+    return count
+
+def countRTL(text):
+    count = countByOffset(text, 0, -1, -2, -3)
 
     if DEBUG:
         print(f"countRTL: {count}")
@@ -57,10 +80,7 @@ def countRTL(text):
     return count
 
 def countLTR(text):
-    count = 0
-    for i in range(len(text) - 3):
-        if text[i:i+4] == "XMAS":
-            count += 1
+    count = countByOffset(text, 0, 1, 2, 3)
 
     if DEBUG:
         print(f"countLTR: {count}")
@@ -71,15 +91,7 @@ def countLTR(text):
 
 def countDown(text):
     # down will have each character exactly LINELEN apart, forwards
-    count = 0
-    for i in range(len(text) - 3):
-        if i + (LINELEN * 3) < len(text):
-            x = text[i]
-            m = text[i + LINELEN]
-            a = text[i + (LINELEN * 2)]
-            s = text[i + (LINELEN * 3)]
-            if x == "X" and m == "M" and a == "A" and s == "S":
-                count += 1
+    count = countByOffset(text, 0, LINELEN, LINELEN * 2, LINELEN * 3)
 
     if DEBUG:
         print(f"countDown: {count}")
@@ -90,20 +102,27 @@ def countDown(text):
 
 def countUp(text):
     # up will have each character exactly LINELEN apart, backwards
-    count = 0
-    for i in range(len(text) - 3):
-        if i + (LINELEN * 3) < len(text):
-            s = text[i]
-            a = text[i + LINELEN]
-            m = text[i + (LINELEN * 2)]
-            x = text[i + (LINELEN * 3)]
-            if x == "X" and m == "M" and a == "A" and s == "S":
-                count += 1
+    count = countByOffset(text, LINELEN * 3, LINELEN * 2, LINELEN, 0)
 
     if DEBUG:
         print(f"countUp: {count}")
         if count != _EX_UP:
             print(f"FAIL: UP is {count}, but expected {_EX_UP}")
+
+    return count
+
+def countDiagSE(text):
+    # DiagSE will have increasing down and to the right, +10, +11, +12.
+    count = countByOffset(text,
+                          0,
+                          LINELEN + 1,
+                          (2*LINELEN) + 2,
+                          (3*LINELEN) + 3)
+
+    if DEBUG:
+        print(f"countDiagSE: {count}")
+        if count != _EX_DIAG_SE:
+            print(f"FAIL: DIAG_SE is {count}, but expected {_EX_DIAG_SE}")
 
     return count
 
@@ -113,6 +132,7 @@ def countAll(text):
     count += countLTR(text)
     count += countDown(text)
     count += countUp(text)
+    count += countDiagSE(text)
     return count
 
 def main():
