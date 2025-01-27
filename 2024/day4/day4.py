@@ -28,6 +28,7 @@ _EX_DIAG_NE = 4
 _EX_DIAG_NW = 4
 _EX_DIAG_SW = 1
 _EX_TOTAL = 18
+_EX_XMAS = 9
 
 # Return file as array of arrays, each character it's own element
 def getFileInput():
@@ -48,11 +49,11 @@ def getExampleInput():
         arr.append(list(line))
     return arr
 
-"""
-Looks for XMAS at the given positions. Put into a separate function to
-minimize error handling code elsewhere.
-"""
-def matchInArray(input_arr, x_r, x_c, m_r, m_c, a_r, a_c, s_r, s_c):
+def matchCharsInArray(input_arr,
+                      x_r, x_c, x_char,
+                      m_r, m_c, m_char,
+                      a_r, a_c, a_char,
+                      s_r, s_c, s_char):
     # Don't go below zero
     if (x_r < 0 or x_c < 0 or
         m_r < 0 or m_c < 0 or
@@ -72,20 +73,30 @@ def matchInArray(input_arr, x_r, x_c, m_r, m_c, a_r, a_c, s_r, s_c):
         s_c >= len(input_arr[s_r])):
         return False
     
-    return (input_arr[x_r][x_c] == "X" and
-            input_arr[m_r][m_c] == "M" and
-            input_arr[a_r][a_c] == "A" and
-            input_arr[s_r][s_c] == "S")
+    return (input_arr[x_r][x_c] == x_char and
+            input_arr[m_r][m_c] == m_char and
+            input_arr[a_r][a_c] == a_char and
+            input_arr[s_r][s_c] == s_char)
+
+    return False
+
+"""
+Looks for XMAS at the given positions. Put into a separate function to
+minimize error handling code elsewhere.
+
+Returns True|False
+"""
+def matchInArray(input_arr, x_r, x_c, m_r, m_c, a_r, a_c, s_r, s_c):
+    return matchCharsInArray(input_arr,
+                             x_r, x_c, "X",
+                             m_r, m_c, "M",
+                             a_r, a_c, "A",
+                             s_r, s_c, "S")
 
 """
 Given a two-dimensional array of characters, goes through every element and looks for "XMAS" starting at the given element. The offsets specify where to find MAS, assuming the first element is X. This is why we only have the offsets for MAS, and not X.
 """
 def countByOffsetInArray(input_arr, m_r, m_c, a_r, a_c, s_r, s_c):
-    # if text is a string, return 0
-    # DELETE THIS
-    if type(input_arr) == str:
-        return 0
-
     count = 0
     # for each row
     for r in range(len(input_arr)):
@@ -99,6 +110,68 @@ def countByOffsetInArray(input_arr, m_r, m_c, a_r, a_c, s_r, s_c):
                                 r + s_r, c + s_c):  # s position
                     count += 1
     return count
+
+"""
+a.b
+.A.
+c.d
+Four positions, the only thing that changes is the letters. So build a function that takes a starting index and calls matchInArray for all combinations of crossing MAS.
+Given an index and the example above, a will be at -1, -1, b at 1 , +1, c at -1, +1, and d at 1, 1.
+"""
+def xMasAtIndex(input_arr, r, c):
+    count = 0
+
+    if input_arr[r][c] != "A":
+        return False
+
+    # M.S
+    # .A.
+    # M.S
+    if matchCharsInArray(input_arr,
+                         r - 1, c - 1, "M",
+                         r - 1, c + 1, "S",
+                         r + 1, c - 1, "M",
+                         r + 1, c + 1, "S"):
+        if DEBUG:
+            print(f"MSMS at {r},{c}")
+        return True
+    
+    # S.M
+    # .A.
+    # S.M
+    if matchCharsInArray(input_arr,
+                         r - 1, c - 1, "S",
+                         r - 1, c + 1, "M",
+                         r + 1, c - 1, "S",
+                         r + 1, c + 1, "M"):
+        if DEBUG:
+            print(f"SMSM at {r},{c}")
+        return True
+    
+    # M.M
+    # .A.
+    # S.S
+    if matchCharsInArray(input_arr,
+                         r - 1, c - 1, "M",
+                         r - 1, c + 1, "M",
+                         r + 1, c - 1, "S",
+                         r + 1, c + 1, "S"):
+        if DEBUG:
+            print(f"MSSM at {r},{c}")
+        return True
+    # S.S
+    # .A.
+    # M.M
+    if matchCharsInArray(input_arr,
+                         r - 1, c - 1, "S",
+                         r - 1, c + 1, "S",
+                         r + 1, c - 1, "M",
+                         r + 1, c + 1, "M"):
+        if DEBUG:
+            print(f"SMMS at {r},{c}")
+        return True
+
+    return False
 
 def countLTR(input_arr):
     # only increment the column counter
@@ -229,11 +302,29 @@ def countAll(input_arr):
             print(f"FAIL: TOTAL is {count}, but expected {_EX_TOTAL}")
     return count
 
+def countXmas(input_arr):
+    count = 0
+
+    # for each row
+    for r in range(len(input_arr)):
+        # for each column
+        for c in range(len(input_arr[r])):
+            if xMasAtIndex(input_arr, r, c):
+                count += 1
+
+    if DEBUG:
+        print(f"countXmas: {count}")
+        if count != _EX_XMAS:
+            print(f"FAIL: Xmas is {count}, but expected {_EX_XMAS}")
+    return count
+
 def main():
-    i = getFileInput()              # Part 1 - 2358
+    i = getFileInput()              
     #i = getExampleInput()
-    c = countAll(i)
+    c = countAll(i)                 # Part 1 - 2358
     print(f"count is {c}")
+    c = countXmas(i)                # Part 2 - 1737
+    print(f"countXmas is {c}")
 
 if __name__ == "__main__":
     main()
