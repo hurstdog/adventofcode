@@ -171,6 +171,20 @@ def countDiagSE(input_arr):
 
     return count
 
+def countDiagSW(input_arr):
+    # DiagSW will have increasing down, decreasing columns.
+    count = countByOffsetInArray(input_arr,
+                                 1, -1,
+                                 2, -2,
+                                 3, -3)
+
+    if DEBUG:
+        print(f"countDiagSW: {count}")
+        if count != _EX_DIAG_SW:
+            print(f"FAIL: DIAG_SW is {count}, but expected {_EX_DIAG_SW}")
+
+    return count
+
 def countDiagNE(input_arr):
     # Row goes down, column goes up
     count = countByOffsetInArray(input_arr,
@@ -185,14 +199,30 @@ def countDiagNE(input_arr):
 
     return count
 
-def countAll(text):
+def countDiagNW(input_arr):
+    # Row goes down, column goes down
+    count = countByOffsetInArray(input_arr,
+                                 -1, -1,
+                                 -2, -2,
+                                 -3, -3)
+
+    if DEBUG:
+        print(f"countDiagNW: {count}")
+        if count != _EX_DIAG_NW:
+            print(f"FAIL: DIAG_NW is {count}, but expected {_EX_DIAG_NW}")
+
+    return count
+
+def countAll(input_arr):
     count = 0
-    count += countLTR(text)
-    count += countRTL(text)
-    count += countDown(text)
-    count += countUp(text)
-    count += countDiagSE(text)
-    count += countDiagNE(text)
+    count += countLTR(input_arr)
+    count += countRTL(input_arr)
+    count += countDown(input_arr)
+    count += countUp(input_arr)
+    count += countDiagSE(input_arr)
+    count += countDiagNE(input_arr)
+    count += countDiagSW(input_arr)
+    count += countDiagNW(input_arr)
 
     if DEBUG:
         print(f"countAll: {count}")
@@ -201,7 +231,7 @@ def countAll(text):
     return count
 
 def main():
-    #input = getInput()
+    #i = getInput()
     i = getExampleInput()
     c = countAll(i)
     print(f"count is {c}")
