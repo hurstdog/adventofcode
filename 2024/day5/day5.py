@@ -89,7 +89,8 @@ def validate_page_listing(listing: str, rules: list[str]) -> bool:
 
 def main():
     try:
-        ordering_rules, page_listings = read_input_sections('test_input.txt')
+        # day 5 part 1 answer: 7074
+        ordering_rules, page_listings = read_input_sections('input.txt')
         
         print("Page Listing Validation:")
         middle_sum = 0
