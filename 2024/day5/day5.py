@@ -87,6 +87,39 @@ def validate_page_listing(listing: str, rules: list[str]) -> bool:
             return False
     return True
 
+def fix_page_listing(listing: str, rules: list[str]) -> str:
+    """
+    Fix an invalid page listing by only swapping numbers that violate the rules.
+    Preserves the original order of numbers as much as possible.
+    
+    Args:
+        listing: A comma-separated string of numbers
+        rules: List of rules in the format "X|Y"
+        
+    Returns:
+        A new comma-separated string with minimal changes to satisfy the rules
+    """
+    numbers = listing.split(',')
+    fixed = False
+    
+    # Keep swapping numbers until all rules are satisfied
+    while not fixed:
+        fixed = True
+        for rule in rules:
+            first, second = parse_rule(rule)
+            try:
+                first_idx = numbers.index(first)
+                second_idx = numbers.index(second)
+                # If both numbers exist and are in wrong order, swap them
+                if first_idx > second_idx:
+                    numbers[first_idx], numbers[second_idx] = numbers[second_idx], numbers[first_idx]
+                    fixed = False
+            except ValueError:
+                # If either number is not in the list, skip this rule
+                continue
+    
+    return ','.join(numbers)
+
 def main():
     try:
         # day 5 part 1 answer: 7074
@@ -95,6 +128,8 @@ def main():
         print("Page Listing Validation:")
         middle_sum = 0
         valid_count = 0
+        fixed_middle_sum = 0
+        invalid_count = 0
         
         for i, listing in enumerate(page_listings, 1):
             is_valid = validate_page_listing(listing, ordering_rules)
@@ -106,10 +141,21 @@ def main():
                 valid_count += 1
                 print(f"Listing {i}: {listing} -> {status} (middle: {middle_num})")
             else:
+                invalid_count += 1
                 print(f"Listing {i}: {listing} -> {status}")
+                # Try to fix the invalid listing
+                fixed_listing = fix_page_listing(listing, ordering_rules)
+                if validate_page_listing(fixed_listing, ordering_rules):
+                    fixed_middle_num = get_middle_number(fixed_listing)
+                    fixed_middle_sum += fixed_middle_num
+                    print(f"  Fixed: {fixed_listing} (middle: {fixed_middle_num})")
+                else:
+                    print("  Could not fix listing")
             
         print(f"\nFound {valid_count} valid sequences")
-        print(f"Sum of middle numbers: {middle_sum}")
+        print(f"Fixed {invalid_count} invalid sequences")
+        print(f"Sum of original middle numbers: {middle_sum}")
+        print(f"Sum of fixed middle numbers: {fixed_middle_sum}")
             
     except Exception as e:
         print(f"Error: {e}")
