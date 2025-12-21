@@ -112,6 +112,7 @@ The dial is rotated L1 to point at 99.
 The dial is rotated L99 to point at 0.
 The dial is rotated R14 to point at 14.
 The dial is rotated L82 to point at 32; during this rotation, it points at 0 once.
+
 In this example, the dial points at 0 three times at the end of a rotation, plus
 three more times during a rotation. So, in this example, the new password would be 6.
 
