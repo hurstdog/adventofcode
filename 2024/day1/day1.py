@@ -40,6 +40,7 @@ total_diff = 0
 for i in range(len(left)):
     diff = abs(int(left[i]) - int(right[i]))
     total_diff = total_diff + diff
+    
     #print("Difference: %s, total: %s" % (diff, total_diff))
 
 print("Total difference: %s" % total_diff)
@@ -54,5 +55,6 @@ for i in range(len(left)):
         multiplier = right_count[num]
     #print("num: %s; multiplier: %s" % (num, multiplier))
     similarity = similarity + (int(num) * multiplier)
+
 
 print("Part 2 Similarity: %s" % similarity)
