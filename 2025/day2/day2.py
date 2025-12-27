@@ -130,7 +130,7 @@ def main():
     f = open('2025/day2/input.txt', 'r')
     ranges = f.readline().rstrip('\n')
     part1sum = sumInvalidIDsInFullRange(ranges)
-    print(f"Part1 sum: {part1sum}")
+    print(f"Part1 sum: {part1sum}")     # Solution: 8576933996
 
 if __name__ == '__main__':
     main()
