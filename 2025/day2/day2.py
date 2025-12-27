@@ -99,10 +99,38 @@ def testSumInvalidIDsInRange():
 
     return success
 
+def sumInvalidIDsInFullRange(r):
+    ranges = r.split(",")
+    s = 0
+    for r in ranges:
+        s = s + sumInvalidIDsInRange(r)
+
+    return s
+
+def testSumInvalidIDsInFullRange():
+    r = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
+    s = sumInvalidIDsInFullRange(r)
+    expected = 33 + 99 + 1010 + 1188511885 + 222222 + 446446 + 38593859
+    if s != expected:
+        if DEBUG:
+            print(f"FAIL: Expected {expected} got {s}")
+            return False
+    else:
+        if DEBUG:
+            print(f"SUCCESS: testSumInvalidIDsInFullRange() got {s}")
+    
+    return True
+
 def main():
-    if not testIsValidID() or not testSumInvalidIDsInRange():
+    if not testIsValidID() or not testSumInvalidIDsInRange() or not testSumInvalidIDsInFullRange():
         print("**** STOPPING EXECUTION AFTER FAILURES ****")
         sys.exit(1)
+
+    # open the file
+    f = open('2025/day2/input.txt', 'r')
+    ranges = f.readline().rstrip('\n')
+    part1sum = sumInvalidIDsInFullRange(ranges)
+    print(f"Part1 sum: {part1sum}")
 
 if __name__ == '__main__':
     main()
